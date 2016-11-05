@@ -71,36 +71,14 @@ public class JasperService {
         request.setReportUnitUri(jasperReportServerConfiguration.getUnitBaseUri() + reportName);
         request.setAsync(true).setOutputFormat(reportOutputFormat);
 
-        RunReportAdapter adapter = session.reportingService().report(request.getReportUnitUri())
+        RunReportAdapter adapter = session
+                .reportingService()
+                .report(request.getReportUnitUri())
                 .prepareForRun(reportOutputFormat);
 
-        JSONObject objectParams = null;
         if (reportParams.size() != 0) {
-            for (Map.Entry m : reportParams.entrySet()) {
-                try {
-                    objectParams = new JSONObject(m.getKey().toString());
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                break;
-            }
-        }
-
-        Iterator keys;
-        if (objectParams != null) {
-            keys = objectParams.keys();
-            while (keys.hasNext()) {
-                String key = (String) keys.next();
-                String value = null;
-                try {
-                    value = objectParams.getString(key);
-                    if (value != null) {
-                        adapter.parameter(key, value);
-                    }
-                } catch (JSONException e) {
-
-                }
+            for (Map.Entry<String, String> m : reportParams.entrySet()) {
+                    adapter.parameter(m.getKey(), m.getValue());
             }
         }
 
@@ -120,7 +98,9 @@ public class JasperService {
             return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
 
         } catch (IOException e) {
+
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+
         }
     }
 }
