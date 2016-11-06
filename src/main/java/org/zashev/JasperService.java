@@ -56,17 +56,16 @@ public class JasperService {
         configuration.setLogHttp(jasperReportServerConfiguration.isLogHttp());
         JasperserverRestClient client = new JasperserverRestClient(configuration);
 
-        Session session = null;
+        Session session;
 
         try {
-            // Authentication and login.
+
             session = client.authenticate(jasperReportServerConfiguration.getUserName(),
                     jasperReportServerConfiguration.getPassword());
         } catch (ProcessingException connectException) {
             return new ResponseEntity(connectException.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        // Instantiating request of server and specifying report parameters. Run a report in asynchronous mode.
         ReportExecutionRequest request = new ReportExecutionRequest();
         request.setReportUnitUri(jasperReportServerConfiguration.getUnitBaseUri() + reportName);
         request.setAsync(true).setOutputFormat(reportOutputFormat);
@@ -83,7 +82,7 @@ public class JasperService {
         }
 
         try {
-            // Run report.
+
             OperationResult<InputStream> operationResult = adapter.run();
 
             InputStreamResource inputStreamResource = new InputStreamResource((InputStream) operationResult.getResponse().getEntity());
